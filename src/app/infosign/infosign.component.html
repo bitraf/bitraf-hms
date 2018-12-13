@@ -1,0 +1,8 @@
+<label>
+  Page name
+  <input type="text" [formControl]="pageName">
+</label>
+<p>
+  Value: https://bitraf.no/wiki/{{ pageName.value }}
+  <button (click)="generate()">Generate</button>
+</p>
