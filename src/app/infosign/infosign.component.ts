@@ -36,6 +36,7 @@ export class InfosignComponent implements OnInit {
   requiredPpes;
   pageUrl;
   downloads = [];
+  warnings = [];
 
   constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
     this.pageName.setValue("CNC3-3018Pro");
@@ -63,6 +64,8 @@ export class InfosignComponent implements OnInit {
     })
     this.svgText = this.sanitizer.bypassSecurityTrustHtml(svgString);
 
+    this.downloads = []
+    this.warnings = []
     this.downloadRdf(url1, (err, doc) => this.handleMainDoc(err, doc));
   }
 
@@ -73,9 +76,11 @@ export class InfosignComponent implements OnInit {
 
   downloadRdf(urlRdf: string, cb) {
     let url = "https://rdf-translator.appspot.com/convert/xml/json-ld/" + urlRdf;
-    this.downloads.push(urlRdf)
+    let tx = {url: urlRdf, done: false}
+    this.downloads.push(tx)
     return this.http.get(url, {responseType: "text"}).
       subscribe((text) => {
+        tx.done = true
         // console.log("text from " + url, text);
         let doc = JSON.parse(text);
         // console.log("doc from " + url, text);
@@ -86,38 +91,35 @@ export class InfosignComponent implements OnInit {
 
   handleMainDoc(err, doc) {
     let pageName = this.pageName.value;
-    console.log("expanded doc", doc);
     let pageId = encodeURI(uriResolverPrefix + pageName);
-    console.log("pageId", pageId);
-    console.log("pageId", this.encode(pageId));
     let page = _.find(doc, {"@id": this.encode(pageId)});
-    console.log("page", page);
 
-    this.title = page["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
-    this.hazards = page[RdfUrls.has_ehs_hazard]
-    this.requiredTrainings = page[RdfUrls.has_required_training]
+    this.title = page[RdfUrls.label][0]["@value"];
     this.ready = true;
 
-    let ppes = page[RdfUrls.has_required_ppe];
-    this.requiredPpes = [];
+    this.requiredTrainings = this.handlePpes(page, RdfUrls.has_required_training)
+    this.hazards = this.handlePpes(page, RdfUrls.has_ehs_hazard)
+    this.requiredPpes = this.handlePpes(page, RdfUrls.has_required_ppe)
+  }
 
-    for (let k in ppes) {
-      let obj = ppes[k]
-      console.log("obj", obj);
-      let ppeUrl = obj["@id"]
-      console.log("ppeUrl", ppeUrl);
-      this.downloadRdf(ppeUrl, (err, ppeDoc) => {
-        console.log("ppe", ppeDoc)
-        let ppe = _.find(ppeDoc, {"@id": ppeUrl});
-        console.log("ppe", ppe)
-        let label = ppe[RdfUrls.label][0]["@value"]
-        console.log("label", label)
+  handlePpes(page, typeUrl) {
+    let items = page[typeUrl];
+    let collection = []
+    for (let k in items) {
+      let url = items[k]["@id"]
+      this.downloadRdf(url, (err, doc) => {
+        let item = _.find(doc, {"@id": url});
+        if (!item) {
+          this.warnings.push("Could not description of " + url)
+          collection.push({label: "Bad: " + url})
+          return
+        }
+        let label = item[RdfUrls.label][0]["@value"]
+        let hasIconUrl = item[RdfUrls.has_icon_url][0]["@id"]
 
-        let hasIconUrl = ppe[RdfUrls.has_icon_url][0]["@id"]
-        console.log("hasIconUrl", hasIconUrl)
-
-        this.requiredPpes.push({label: label, icon: hasIconUrl})
+        collection.push({label: label, icon: hasIconUrl})
       })
     }
+    return collection
   }
 }

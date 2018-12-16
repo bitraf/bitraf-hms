@@ -12,7 +12,7 @@
 <ul>
   <li *ngFor="let d of downloads">
     <!-- <a href={{ d }}>{{d}}</a> -->
-    {{d}}
+    {{d.url}}, done={{d.done}}
   </li>
 </ul>
 <hr/>
@@ -25,19 +25,25 @@
 
 <h2>Hazards</h2>
 <ul>
-<li *ngFor="let i of hazards">{{i["@id"]}}</li>
+<li *ngFor="let i of hazards">
+  {{i.label}}
+  <img *ngIf="i.icon" width="50" height="50" src={{i.icon}}/>
+</li>
 </ul>
 
 <h2>Required training</h2>
 <ul>
-<li *ngFor="let i of requiredTrainings">{{i["@id"]}}</li>
+<li *ngFor="let i of requiredTrainings">
+  {{i.label}}
+  <img *ngIf="i.icon" width="50" height="50" src={{i.icon}}/>
+</li>
 </ul>
 
 <h2>Required personal protection equipment</h2>
 <ul>
 <li *ngFor="let i of requiredPpes">
-{{i.label}}
-<img src={{i.icon}}/>
+  {{i.label}}
+  <img *ngIf="i.icon" width="50" height="50" src={{i.icon}}/>
 </li>
 </ul>
 </section>
