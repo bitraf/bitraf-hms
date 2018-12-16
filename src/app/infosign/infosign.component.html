@@ -6,10 +6,19 @@
   Value: https://bitraf.no/wiki/{{ pageName.value }}
   <button (click)="generate()">Generate</button>
 </p>
+<p>
+  Downloads:
+</p>
+<ul>
+  <li *ngFor="let d of downloads">
+    <!-- <a href={{ d }}>{{d}}</a> -->
+    {{d}}
+  </li>
+</ul>
 <hr/>
 <section *ngIf="ready">
-<figure>
-<span style="float: right" [innerHtml]="svgText"></span>
+<figure style="float: right">
+<span [innerHtml]="svgText"></span>
 <figcaption>{{pageUrl}}</figcaption>
 </figure>
 <h1>{{title}}</h1>
@@ -26,6 +35,9 @@
 
 <h2>Required personal protection equipment</h2>
 <ul>
-<li *ngFor="let i of requiredPpes">{{i["@id"]}}</li>
+<li *ngFor="let i of requiredPpes">
+{{i.label}}
+<img src={{i.icon}}/>
+</li>
 </ul>
 </section>
