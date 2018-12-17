@@ -1,3 +1,4 @@
+<section id="input">
 <label>
   Page name
   <input type="text" [formControl]="pageName">
@@ -16,21 +17,42 @@
   </li>
 </ul>
 <hr/>
-<section *ngIf="ready">
-<figure style="float: right">
-<span [innerHtml]="svgText"></span>
-<figcaption>{{pageUrl}}</figcaption>
+</section>
+<section id="status" *ngIf="status">
+  <p>{{status}}</p>
+  <p>Check the console!</p>
+</section>
+
+
+<section id="sign" *ngIf="ready">
+
+<div id="qr" style="float: right">
+<figure>
+  <span id=qr-code [innerHtml]="svgText"></span>
+  <figcaption>{{pageUrl}}</figcaption>
 </figure>
+</div>
+
+<div>
 <h1>{{title}}</h1>
 
+<section id="hazards">
 <h2>Hazards</h2>
-<ul>
-<li *ngFor="let i of hazards">
-  {{i.label}}
-  <img *ngIf="i.icon" width="50" height="50" src={{i.icon}}/>
-</li>
-</ul>
+<figure *ngFor="let i of hazards" class=icon>
+  <img *ngIf="i.icon" class=icon src={{i.icon}}/>
+  <figcaption>{{i.label}}</figcaption>
+</figure>
+</section>
 
+<section id=ppe>
+<h2>Required personal protection equipment</h2>
+<figure *ngFor="let i of requiredPpes" class=icon>
+  <img *ngIf="i.icon" class=icon src={{i.icon}}/>
+  <figcaption>{{i.label}}</figcaption>
+</figure>
+</section>
+
+<section id="training">
 <h2>Required training</h2>
 <ul>
 <li *ngFor="let i of requiredTrainings">
@@ -38,12 +60,7 @@
   <img *ngIf="i.icon" width="50" height="50" src={{i.icon}}/>
 </li>
 </ul>
+</section>
 
-<h2>Required personal protection equipment</h2>
-<ul>
-<li *ngFor="let i of requiredPpes">
-  {{i.label}}
-  <img *ngIf="i.icon" width="50" height="50" src={{i.icon}}/>
-</li>
-</ul>
+</div>
 </section>

@@ -30,6 +30,7 @@ export class InfosignComponent implements OnInit {
   svgText: SafeHtml;
 
   ready: boolean = false;
+  status: string = "";
   title;
   hazards;
   requiredTrainings;
@@ -39,7 +40,7 @@ export class InfosignComponent implements OnInit {
   warnings = [];
 
   constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
-    this.pageName.setValue("CNC3-3018Pro");
+    this.pageName.setValue("ShopBot");
   }
 
   ngOnInit() {
@@ -66,6 +67,8 @@ export class InfosignComponent implements OnInit {
 
     this.downloads = []
     this.warnings = []
+    this.status = null
+    this.ready = false
     this.downloadRdf(url1, (err, doc) => this.handleMainDoc(err, doc));
   }
 
@@ -91,11 +94,19 @@ export class InfosignComponent implements OnInit {
 
   handleMainDoc(err, doc) {
     let pageName = this.pageName.value;
+
     let pageId = encodeURI(uriResolverPrefix + pageName);
     let page = _.find(doc, {"@id": this.encode(pageId)});
 
+    if (!page) {
+      console.log("pageId", pageId)
+      console.log("page", doc)
+      this.status = "Could not find page object."
+      return
+    }
+    this.ready = true
+
     this.title = page[RdfUrls.label][0]["@value"];
-    this.ready = true;
 
     this.requiredTrainings = this.handlePpes(page, RdfUrls.has_required_training)
     this.hazards = this.handlePpes(page, RdfUrls.has_ehs_hazard)

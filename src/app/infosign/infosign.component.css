@@ -1,0 +1,30 @@
+/* disable for now */
+section#ppe {
+  display: none;
+}
+
+#ppe h2, #hazards h2 {
+  display: none;
+}
+
+.icon {
+  float: left;
+}
+
+h2 {
+  clear: left;
+}
+
+figcaption {
+  text-align: center;
+}
+
+section img {
+  width: 3cm;
+  height: 3cm;
+}
+
+#qr figcaption {
+  font-weight: bold;
+  font-size: larger;
+}
