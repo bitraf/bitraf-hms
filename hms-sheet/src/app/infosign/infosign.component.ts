@@ -57,8 +57,8 @@ export class InfosignComponent implements OnInit {
     let svgString = qrcode({
       content: pageUrl,
       padding: 4,
-      width: 256,
-      height: 256,
+      width: 175,
+      height: 175,
       color: "#000000",
       background: "#ffffff",
       ecl: "M"

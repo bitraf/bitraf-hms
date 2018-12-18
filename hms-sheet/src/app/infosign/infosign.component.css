@@ -1,5 +1,5 @@
 /* disable for now */
-section#ppe {
+section#training {
   display: none;
 }
 
@@ -11,7 +11,7 @@ section#ppe {
   float: left;
 }
 
-h2 {
+#ppe {
   clear: left;
 }
 
