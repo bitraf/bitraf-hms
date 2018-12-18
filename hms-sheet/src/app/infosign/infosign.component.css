@@ -28,3 +28,9 @@ section img {
   font-weight: bold;
   font-size: larger;
 }
+
+section#bottom {
+  clear: both;
+  position: fixed;
+  bottom: 5mm;
+}

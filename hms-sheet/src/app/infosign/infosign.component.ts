@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core'
 import { FormControl } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -17,6 +17,7 @@ enum RdfUrls {
   has_required_training = "https://bitraf.no/wiki/Special:URIResolver/Property-3AHas_required_training",
   has_required_ppe = "https://bitraf.no/wiki/Special:URIResolver/Property-3AHas_required_PPE",
   has_icon_url = "https://bitraf.no/wiki/Special:URIResolver/Property-3AHas_Icon_URL",
+  has_siste_hms_gjennomgang = "https://bitraf.no/wiki/Special:URIResolver/Property-3AHas_siste_HMS-2Dgjennomgang",
   label = "http://www.w3.org/2000/01/rdf-schema#label",
 }
 
@@ -29,18 +30,20 @@ export class InfosignComponent implements OnInit {
   pageName = new FormControl("");
   svgText: SafeHtml;
 
-  ready: boolean = false;
-  status: string = "";
-  title;
-  hazards;
-  requiredTrainings;
-  requiredPpes;
-  pageUrl;
-  downloads = [];
-  warnings = [];
+  ready: boolean
+  activeDownloads: number = 0
+  status: string = ""
+  title
+  hazards
+  requiredTrainings
+  requiredPpes
+  pageUrl
+  lastEhsReview
+  downloads = []
+  warnings = []
 
   constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
-    this.pageName.setValue("ShopBot");
+    this.pageName.setValue("ShopBot")
   }
 
   ngOnInit() {
@@ -68,7 +71,9 @@ export class InfosignComponent implements OnInit {
     this.downloads = []
     this.warnings = []
     this.status = null
+    this.lastEhsReview = null;
     this.ready = false
+    this.activeDownloads = 0
     this.downloadRdf(url1, (err, doc) => this.handleMainDoc(err, doc));
   }
 
@@ -81,9 +86,11 @@ export class InfosignComponent implements OnInit {
     let url = "https://rdf-translator.appspot.com/convert/xml/json-ld/" + urlRdf;
     let tx = {url: urlRdf, done: false}
     this.downloads.push(tx)
+    this.activeDownloads++
     return this.http.get(url, {responseType: "text"}).
       subscribe((text) => {
         tx.done = true
+        this.activeDownloads--
         // console.log("text from " + url, text);
         let doc = JSON.parse(text);
         // console.log("doc from " + url, text);
@@ -100,13 +107,16 @@ export class InfosignComponent implements OnInit {
 
     if (!page) {
       console.log("pageId", pageId)
-      console.log("page", doc)
+      console.log("doc", doc)
       this.status = "Could not find page object."
       return
     }
+    console.log("page", page)
     this.ready = true
 
     this.title = page[RdfUrls.label][0]["@value"];
+    this.title = page[RdfUrls.label][0]["@value"];
+    this.lastEhsReview = page[RdfUrls.has_siste_hms_gjennomgang][0]["@value"];
 
     this.requiredTrainings = this.handlePpes(page, RdfUrls.has_required_training)
     this.hazards = this.handlePpes(page, RdfUrls.has_ehs_hazard)

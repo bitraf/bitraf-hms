@@ -1,21 +1,27 @@
 <section id="input">
+<h1>HMS sheet generator</h1>
+<p>
+This page will generate a page that can be printet on A5 paper sheets. This application and the pages are by and for <a href="https://bitraf.no/wiki/HMS">Bitraf's HMS system</a>.
+</p>
+<p>
+The application will pull the required data from Bitraf's wiki, it is a bit slow so give it some time to download all the data and pictures.
+</p>
 <label>
-  Page name
+  Wiki page name
   <input type="text" [formControl]="pageName">
 </label>
-<p>
-  Value: https://bitraf.no/wiki/{{ pageName.value }}
-  <button (click)="generate()">Generate</button>
-</p>
-<p>
-  Downloads:
-</p>
+<button (click)="generate()">Generate</button>
+
+<section *ngIf=false>
+<p>Downloads:</p>
 <ul>
   <li *ngFor="let d of downloads">
     <!-- <a href={{ d }}>{{d}}</a> -->
     {{d.url}}, done={{d.done}}
   </li>
 </ul>
+</section>
+
 <hr/>
 </section>
 <section id="status" *ngIf="status">
@@ -24,7 +30,7 @@
 </section>
 
 
-<section id="sign" *ngIf="ready">
+<section id="sign" *ngIf="ready && activeDownloads == 0">
 
 <div id="qr" style="float: right">
 <figure>
@@ -61,7 +67,10 @@
 </ul>
 </section>
 
-<div id=page-url>{{pageUrl}}</div>
+<section id=bottom>
+<div id=page-url>For more info scan the QR code or see: <a href={{pageUrl}}>{{pageUrl}}</a>.</div>
+<div id=page-url>Last EHS review: {{lastEhsReview}}</div>
+</section>
 
 </div>
 </section>
